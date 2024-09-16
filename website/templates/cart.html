@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% block style %}<link rel="stylesheet" href="{{ url_for('static', filename='css/cart_style.css') }}">{% endblock style %}
+{% block title %}Shopping Cart{% endblock title %}
+
+
+{% block menu %}
+<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+  <div class="navbar-nav ms-auto">
+    <a class="nav-link " aria-current="page" href="{{ url_for('views.main_page') }}">Store</a>
+  </div>
+</div>
+{% endblock menu %}
+
+{% block content %}
+    <div class="ShoppingCart">
+        <h3>Shopping Cart</h3>
+    </div>
+    <div class="container">
+        <div class="product">
+            <table>
+                <tr id="table-head">
+                    <th>Product</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th></th>
+                    <th>Total Price</th>
+                </tr>
+    
+                <tr>
+                    {% for item in items %} 
+                        {% set quantity = 1 %}
+                        <tr id="productRow{{ loop.index }}">
+                            <td class="product"><img
+                                src="{{ url_for('static', filename=item[0]) }}"
+                                alt="product_image"></td>
+                            <td class="product_name">{{item[1]}}</td>
+                            <td class="product_price" id="Price{{ loop.index }}"><p>{{item[2][0:-1]}} €</p><p>{{item[3][0:-4]}} IRR</p></td>
+                            <td class="quantity">
+                                <input class="decrease" type="button" value="-" onclick="decreaseQuantity({{ loop.index }})">
+                                <span id="quantityValue{{ loop.index }}">{{quantity}}</span>
+                                <input class="increase" type="button" value="+" onclick="increaseQuantity({{ loop.index }})"> 
+                            </td>
+                            <td class="product-removal">
+                                <button class="remove-product" onclick="remove_product({{ loop.index }})">
+                                    Remove
+                                </button>
+                            </td>
+                            <td class="total_price" id="totalPrice{{ loop.index }}"><p>{{item[2][0:-1]*quantity}} €</p><p>{{item[3][0:-4]*quantity}} IRR</p></td>   
+                        </tr>
+                        {% endfor %} 
+                </tr>
+            </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="product_info">
+      <div class="btn_area">
+        <a href="{{ url_for('views.main_page') }}" target="_parent">
+          <input type="submit" value="Checkout" onclick="checkout()">
+        </a>
+        
+      </div>
+
+    <script>
+        let quantity = 1;
+
+        function isCartEmpty() {
+            let items = document.getElementsByTagName("tr");
+            return items.length <= 2; // Only header and empty row
+        }
+
+        function show_notification(message) {
+            alert(message);
+        }
+
+        function checkout() {
+            if (isCartEmpty()) {
+                show_notification("Your shopping cart is empty.");
+            } else {
+                show_notification("Thank you for your purchase!");
+            }
+        }
+        function remove_product(index) {
+            let productRow = document.getElementById("productRow" + index);
+            productRow.remove();
+            alert("The product has been removed!");
+        }
+
+        function increaseQuantity(index) {
+            let quantityElement = document.getElementById("quantityValue" + index);
+            let quantity = parseInt(quantityElement.innerText);
+            quantity += 1;
+            updateQuantityDisplay(quantityElement, quantity);
+            updateTotalQuantityDisplay(index, quantity);
+        }
+        function decreaseQuantity(index) {
+            let quantityElement = document.getElementById("quantityValue" + index);
+            let quantity = parseInt(quantityElement.innerText);
+            if (quantity === 1) {
+                remove_product();
+        } else {
+                quantity -= 1;
+                updateQuantityDisplay(quantityElement, quantity);
+                updateTotalQuantityDisplay(index, quantity);
+            }
+        }
+        function updateQuantityDisplay(element, quantity) {
+            element.innerText = quantity;
+        }
+        function updateTotalQuantityDisplay(index, quantity) {
+            let totalPriceElement = document.getElementById("totalPrice" + index);
+            let priceElement = document.getElementById("Price" + index);
+            let priceValues = priceElement.getElementsByTagName("p");
+            let euroPrice = parseFloat(priceValues[0].innerText.split(" ")[0]);
+            let irrPrice = parseFloat(priceValues[1].innerText.split(" ")[0]);
+            let newEuroPrice = euroPrice * quantity;
+            let newIrrPrice = irrPrice * quantity;
+            let totalPriceValues = totalPriceElement.getElementsByTagName("p");
+            totalPriceValues[0].innerText = newEuroPrice.toFixed(2) + " €";
+            totalPriceValues[1].innerText = newIrrPrice.toFixed(2) + " IRR";
+        }
+    </script>
+
+
+{% endblock content %}
+

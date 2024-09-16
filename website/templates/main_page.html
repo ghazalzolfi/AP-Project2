@@ -1,0 +1,93 @@
+{% extends 'base.html' %} {% block style %}<link
+	rel="stylesheet"
+	href="{{ url_for('static', filename='css/main_page_style.css') }}"
+/>{% endblock style %} {% block title %}Store{% endblock title %} {% block menu
+%}
+<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+	<ul class="navbar-nav ms-auto">
+		<li class="nav-item">
+			<a class="nav-link" href="{{ url_for('views.shopping_cart') }}"
+				>Shopping Cart
+			</a>
+		</li>
+	</ul>
+	<div class="navbar-nav">
+		<a
+			class="nav-link"
+			aria-current="page"
+			href="{{ url_for('views.add_product') }}"
+			>Add Product
+		</a>
+	</div>
+</div>
+{% endblock menu %} {% block content %}
+
+<div class="container">
+	{% for item in items %}
+	<div class="item-box" style="position: relative">
+		<div class="img-description">
+			<img src="{{ url_for('static', filename=item[4]) }}" />
+			<div class="info">{{ item[5] }}</div>
+		</div>
+		<h3>{{ item[1] }}</h3>
+		<p>{{ item[2] }} €</p>
+		<p>{{ item[6] }} IRR</p>
+		<p>stock:{{ item[3] }}</p>
+		<button>Add to cart</button>
+		<button id="{{ item[0] }}" class="add-to-cart">Add to cart</button>
+	</div>
+	{% endfor %}
+	
+</div>
+<footer class="navbar" style="border-radius: 3px 3px 0 0;text-align: center ;color: #ffffff; height: 200px; display: flex; justify-content: space-between; padding: 0 100px;">
+	<div>
+		<h3>Owners</h3>
+		<div>Gazal Zolfi</div>
+		<div>Hosein Mohamadjafari</div>
+		<div>Mohamadreza Raouf</div>
+	</div>
+		
+	<div>
+		<h3>Address</h3>
+		<div>Iran</div>
+		<div>Tehran</div>
+		<div>Sharif University</div>
+	</div>
+
+	<div>
+		<h3>Get In Touch</h3>
+		<div>+2166666666</div>
+		<div>+2166666665</div>
+		<div>+2166666664</div>
+	</div>
+	
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+	$(document).ready(function () {
+		$(".add-to-cart").click(function () {
+			const itemId = $(this).attr("id");
+			$.ajax({
+				url: "/cart",
+				method: "POST",
+				data: {
+					item_id: itemId,
+				},
+			}).done(function (response) {
+				if (response.status === "success") {
+					alert("Item added to cart.");
+				} else {
+					alert("Item is already in the cart.");
+				}
+			});
+		});
+	});
+</script>
+
+
+
+</script>
+
+
+{% endblock content %}
